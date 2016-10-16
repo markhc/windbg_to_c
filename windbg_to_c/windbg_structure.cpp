@@ -11,8 +11,19 @@ windbg_structure::windbg_structure(const std::string& text)
         return trim_spaces(str);
     });
 
+    //
+    // For each line...
+    //
     for(auto it = lines.begin(); it != lines.end(); ++it) {
         if(it->empty()) continue;
+
+        //
+        // A line can be either:
+        //  - Header
+        //  - Union
+        //  - Bitfield
+        //  - Regular type
+        //
         if(is_header(*it)) {
             _name = it->substr(it->find('!') + 1);
             if(_name[0] == '_')
@@ -31,18 +42,19 @@ windbg_structure::windbg_structure(const std::string& text)
                 union_fields.begin(),
                 union_fields.end(),
                 [](const windbg_field& field) { return field.is_bitfield(); });
+
             if(bitfield_count != union_fields.size()) { //Its a union of a bitfield + non-bitfield
                 windbg_field field;
-                windbg_field bitfield;
+                windbg_field bitfield_pack;
 
                 for(auto& f : union_fields) {
                     if(f.is_bitfield())
-                        bitfield.append_bitfield_member(f);
+                        bitfield_pack.append_bitfield_member(f);
                     else
                         field.append_union_member(f);
                 }
 
-                field.append_union_member(bitfield);
+                field.append_union_member(bitfield_pack);
                 _fields.emplace_back(std::move(field));
             } else if(bitfield_count == 0) { //It just a union
                 windbg_field field;
