@@ -96,12 +96,20 @@ void windbg_field::parse_field_type(const std::string& line)
     //
     if(type_string.find("Pos") == 0) {
         _is_bitfield = true;
-        _type = "UCHAR";
         auto separator = type_string.find(',');
         auto pos = type_string.substr(4, separator - 4);
         auto len = type_string.substr(separator + 2);
         _bitfield_pos = std::strtoul(std::data(pos), nullptr, 10);
         _bitfield_len = std::strtoul(std::data(len), nullptr, 10);
+
+        if(_bitfield_len > 32)
+            _type = "ULONGLONG";
+        else if(_bitfield_len > 16)
+            _type = "ULONG";
+        else if(_bitfield_len > 8)
+            _type = "USHORT";
+        else
+            _type = "UCHAR";
         return;
     }
 
