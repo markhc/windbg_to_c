@@ -146,6 +146,7 @@ typedef struct _PEB
             UCHAR SpareBits : 1;
         };
     };
+    UCHAR Padding0[4];
     PVOID Mutant;
     PVOID ImageBaseAddress;
     PPEB_LDR_DATA Ldr;
@@ -166,10 +167,12 @@ typedef struct _PEB
             ULONG ReservedBits0 : 27;
         };
     };
+    UCHAR Padding1[4];
     union {
         PVOID KernelCallbackTable;
         PVOID UserSharedInfoPtr;
     };
+    ULONG SystemReserved[1];
     ULONG AtlThunkSListPtr32;
     PVOID ApiSetMap;
     ULONG TlsExpansionCounter;
@@ -241,6 +244,7 @@ typedef struct _PEB
             ULONG SpareTracingBits : 29;
         };
     };
+    UCHAR Padding6[4];
     ULONGLONG CsrServerReadOnlySharedMemoryBase;
     ULONGLONG TppWorkerpListLock;
     LIST_ENTRY TppWorkerpList;

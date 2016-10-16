@@ -36,8 +36,7 @@ windbg_structure::windbg_structure(const std::string& text)
             } while(is_union_or_bitfield(it));
 
             union_fields.emplace_back(parse_field(*it));
-            ++it;
-            
+
             auto bitfield_count = std::count_if(
                 union_fields.begin(),
                 union_fields.end(),
