@@ -133,11 +133,9 @@ typedef struct _PEB
     UCHAR InheritedAddressSpace;
     UCHAR ReadImageFileExecOptions;
     UCHAR BeingDebugged;
-    union
-    {
+    union {
         UCHAR BitField;
-        struct
-        {
+        struct {
             UCHAR ImageUsesLargePages : 1;
             UCHAR IsProtectedProcess : 1;
             UCHAR IsImageDynamicallyRelocated : 1;
@@ -157,11 +155,9 @@ typedef struct _PEB
     PRTL_CRITICAL_SECTION FastPebLock;
     PVOID AtlThunkSListPtr;
     PVOID IFEOKey;
-    union
-    {
+    union {
         ULONG CrossProcessFlags;
-        struct
-        {
+        struct {
             UCHAR ProcessInJob : 1;
             UCHAR ProcessInitializing : 1;
             UCHAR ProcessUsingVEH : 1;
@@ -170,11 +166,9 @@ typedef struct _PEB
             ULONG ReservedBits0 : 27;
         };
     };
-    union
-    {
+    union {
         PVOID KernelCallbackTable;
         PVOID UserSharedInfoPtr;
-         ;
     };
     ULONG AtlThunkSListPtr32;
     PVOID ApiSetMap;
@@ -214,7 +208,7 @@ typedef struct _PEB
     UCHAR Padding4[4];
     ULONGLONG ActiveProcessAffinityMask;
     ULONG GdiHandleBuffer[60];
-    Pvoid PostProcessInitRoutine;
+    PVOID PostProcessInitRoutine;
     PVOID TlsExpansionBitmap;
     ULONG TlsExpansionBitmapBits[32];
     ULONG SessionId;
@@ -238,11 +232,9 @@ typedef struct _PEB
     PVOID WerShipAssertPtr;
     PVOID pUnused;
     PVOID pImageHeaderHash;
-    union
-    {
+    union {
         ULONG TracingFlags;
-        struct
-        {
+        struct {
             UCHAR HeapTracingEnabled : 1;
             UCHAR CritSecTracingEnabled : 1;
             UCHAR LibLoaderTracingEnabled : 1;
@@ -252,6 +244,6 @@ typedef struct _PEB
     ULONGLONG CsrServerReadOnlySharedMemoryBase;
     ULONGLONG TppWorkerpListLock;
     LIST_ENTRY TppWorkerpList;
-    PVOID* WaitOnAddressHashTable;
+    PVOID WaitOnAddressHashTable[128];
 } PEB, *PPEB;
 ```
