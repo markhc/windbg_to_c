@@ -29,7 +29,7 @@ windbg_structure::windbg_structure(const std::string& text)
             if(_name[0] == '_')
                 _name = _name.substr(1);
         } else if(is_union_or_bitfield(it)) {
-            std::vector<std::shared_ptr<windbg_field>> union_fields;
+            std::vector<std::unique_ptr<windbg_field>> union_fields;
             do {
                 union_fields.emplace_back(parse_field(*it));
                 ++it;
@@ -41,31 +41,31 @@ windbg_structure::windbg_structure(const std::string& text)
             auto bitfield_count = std::count_if(
                 union_fields.begin(),
                 union_fields.end(),
-                [](const std::shared_ptr<windbg_field>& field) { return field->is_bitfield(); });
+                [](const std::unique_ptr<windbg_field>& field) { return field->is_bitfield(); });
             
             if(bitfield_count != union_fields.size() && bitfield_count != 0) { //Its a union of a bitfield + non-bitfield
-                std::shared_ptr<windbg_union> field = std::make_unique<windbg_union>(parse_field_offset(*it));
-                std::shared_ptr<windbg_bitfield_pack> pack = std::make_unique<windbg_bitfield_pack>(parse_field_offset(*it));
+                std::unique_ptr<windbg_union>         field = std::make_unique<windbg_union>(parse_field_offset(*it));
+                std::unique_ptr<windbg_bitfield_pack> pack = std::make_unique<windbg_bitfield_pack>(parse_field_offset(*it));
 
                 for(auto& f : union_fields) {
                     if(f->is_bitfield())
-                        pack->add_bitfield_member(f);
+                        pack->add_bitfield_member(std::move(f));
                     else
-                        field->add_union_member(f);
+                        field->add_union_member(std::move(f));
                 }
 
-                field->add_union_member(pack);
+                field->add_union_member(std::move(pack));
                 _fields.emplace_back(std::move(field));
             } else if(bitfield_count == 0) { //It just a union
-                std::shared_ptr<windbg_union> field = std::make_unique<windbg_union>(parse_field_offset(*it));
+                std::unique_ptr<windbg_union> field = std::make_unique<windbg_union>(parse_field_offset(*it));
                 for(auto& f : union_fields) {
-                    field->add_union_member(f);
+                    field->add_union_member(std::move(f));
                 }
                 _fields.emplace_back(std::move(field));
             } else { //It's just a bitfield
-                std::shared_ptr<windbg_bitfield_pack> pack = std::make_unique<windbg_bitfield_pack>(parse_field_offset(*it));
+                std::unique_ptr<windbg_bitfield_pack> pack = std::make_unique<windbg_bitfield_pack>(parse_field_offset(*it));
                 for(auto& f : union_fields) {
-                    pack->add_bitfield_member(f);
+                    pack->add_bitfield_member(std::move(f));
                 }
                 _fields.emplace_back(std::move(pack));
             }
@@ -80,7 +80,7 @@ bool windbg_structure::is_header(const std::string& line)
     return line.find('!') != std::string::npos;
 }
 
-std::shared_ptr<windbg_field> windbg_structure::parse_field(const std::string& line)
+std::unique_ptr<windbg_field> windbg_structure::parse_field(const std::string& line)
 {
     using namespace std::string_literals;
 

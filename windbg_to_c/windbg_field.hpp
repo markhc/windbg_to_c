@@ -9,6 +9,9 @@ class windbg_field
 {
 public:
     windbg_field(std::string name, std::string type, uint32_t offset);
+    windbg_field(const windbg_field&) = delete;
+    windbg_field& operator=(const windbg_field&) = delete;
+
     virtual ~windbg_field();
 
     virtual bool is_array() const = 0;
@@ -65,7 +68,7 @@ class windbg_union
 {
 public:
     windbg_union(uint32_t offset);
-
+    
     bool is_array() const override { return false; }
     bool is_union() const override { return true; }
     bool is_bitfield() const override { return false; }
@@ -73,12 +76,12 @@ public:
 
     std::string as_string(int tabcount = 0) const override;
 
-    void add_union_member(const std::shared_ptr<windbg_field>& m)
+    void add_union_member(std::unique_ptr<windbg_field>&& m)
     {
-        _members.push_back(m);
+        _members.push_back(std::move(m));
     }
 private:
-    std::vector<std::shared_ptr<windbg_field>> _members;
+    std::vector<std::unique_ptr<windbg_field>> _members;
 };
 
 class windbg_bitfield
@@ -115,11 +118,11 @@ public:
 
     std::string as_string(int tabcount = 0) const override;
 
-    void add_bitfield_member(const std::shared_ptr<windbg_field>& m)
+    void add_bitfield_member(std::unique_ptr<windbg_field>&& m)
     {
-        _members.emplace_back(m);
+        _members.emplace_back(std::move(m));
     }
 private:
-    std::vector<std::shared_ptr<windbg_field>> _members;
+    std::vector<std::unique_ptr<windbg_field>> _members;
 };
 

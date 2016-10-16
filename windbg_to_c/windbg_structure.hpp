@@ -68,8 +68,8 @@ private:
         return strtoul(std::data(temp), nullptr, 16);
     }
     
-    static std::shared_ptr<windbg_field> parse_field(const std::string& line);
+    static std::unique_ptr<windbg_field> parse_field(const std::string& line);
 private:
     std::string _name;
-    std::vector<std::shared_ptr<windbg_field>> _fields;
+    std::vector<std::unique_ptr<windbg_field>> _fields;
 };
